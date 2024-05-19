@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PROG_slutprojekt_backend.Models;
+using Supabase.Gotrue;
 
 namespace PROG_slutprojekt_backend.Controllers
 {
@@ -25,13 +26,14 @@ namespace PROG_slutprojekt_backend.Controllers
                 var supabase = new Supabase.Client(url, key, options);
                 await supabase.InitializeAsync();
 
-                var existingUser = supabase.From<SupabaseUser>().Where(x => x.email == user.email);
+                var existingUser = supabase.From<SupabaseUser>().Where(x => x.email == user.email).Get();
 
-                if(existingUser.Single().Result != null)
+                
+
+                if(existingUser.Result.Model != null)
                 {
                     return new ConflictObjectResult(new { message = "user already has an account" });
                 }
-
 
                 var hashedPassword = Argon2.Hash(user.password);
 
@@ -70,21 +72,29 @@ namespace PROG_slutprojekt_backend.Controllers
 
                 var supabase = new Supabase.Client(url, key, options);
                 await supabase.InitializeAsync();
-                var user = supabase.From<SupabaseUser>().Where(x => x.email == signInUser.email);
+                var existingUser = supabase.From<SupabaseUser>().Where(x => x.email == signInUser.email).Get();
 
-                var userResult = await user.Single();
+                var user = existingUser.Result.Model;
 
-                if (userResult == null)
+                if (user == null)
                 {
                     return new NotFoundObjectResult(new { message = "User not found" });
                 }
-                var passwordIsValid = Argon2.Verify(userResult.password ,signInUser.password);
+                var passwordIsValid = Argon2.Verify(user.password ,signInUser.password);
 
                 if (!passwordIsValid)
                 {
                     return new UnauthorizedObjectResult(new { message = "Invalid credentials" });
                 }
-                
+
+             
+                return new JsonResult(new {
+                    user.username,
+                    user.email,
+                    user.createdAt,
+                    user.id,
+                });
+
             }
             catch (Exception ex)
             {
@@ -93,7 +103,6 @@ namespace PROG_slutprojekt_backend.Controllers
             }
 
 
-            return new JsonResult(new { message = "Valid credentials", success = true });
         }
     }
 }

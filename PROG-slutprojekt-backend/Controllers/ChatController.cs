@@ -31,8 +31,7 @@ namespace PROG_slutprojekt_backend.Controllers
 
                 if (chatRooms == null || chatRooms.Count == 0)
                 {
-                    Console.WriteLine($"No chat rooms found for user {userId}");
-                    return new JsonResult(new { error = $"No chat rooms found for user {userId}" });
+                    return NotFound(new { message = $"No chat rooms found for user {userId}" });
                 }
 
                 var chatRoomsDetails = new List<object>();
@@ -56,15 +55,20 @@ namespace PROG_slutprojekt_backend.Controllers
                     });    
                 }
 
-                return new JsonResult(new { chatRoomsDetails });
-
+                return Ok(new { chatRoomsDetails });
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return StatusCode(503, new { message = "Service unavailable. Please try again later.", error = httpEx.Message });
+            }
+            catch (TimeoutException timeoutEx)
+            {
+                return StatusCode(504, new { message = "Request timed out. Please try again later.", error = timeoutEx.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
-
-
         }
 
         [HttpPost("chatrooms/sendMessage")]
@@ -91,7 +95,15 @@ namespace PROG_slutprojekt_backend.Controllers
 
                 await supabase.From<SupabaseChatMessages>().Insert(chatMessage);
 
-                return StatusCode(200, new { success = true});
+                return Ok(new { success = true });
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return StatusCode(503, new { message = "Service unavailable. Please try again later.", error = httpEx.Message });
+            }
+            catch (TimeoutException timeoutEx)
+            {
+                return StatusCode(504, new { message = "Request timed out. Please try again later.", error = timeoutEx.Message });
             }
             catch (Exception ex)
             {
@@ -120,8 +132,7 @@ namespace PROG_slutprojekt_backend.Controllers
                 
                 if (chatMessages == null || chatMessages.Count == 0)
                 {
-                    Console.WriteLine($"No chat messages found for chat room {chatRoomId}");
-                    return new JsonResult(new { error = $"No chat messages found for chat room {chatRoomId}" });
+                    return NotFound(new { message = $"No chat messages found for chat room {chatRoomId}" });
                 }
 
                 //make new json object with only the necessary fields
@@ -134,15 +145,20 @@ namespace PROG_slutprojekt_backend.Controllers
                     m.user?.username
                 }).ToList();
 
-                return new JsonResult(new { messages });
+                return Ok(new { messages });
+            }
+            catch (HttpRequestException httpEx)
+            {
+                return StatusCode(503, new { message = "Service unavailable. Please try again later.", error = httpEx.Message });
+            }
+            catch (TimeoutException timeoutEx)
+            {
+                return StatusCode(504, new { message = "Request timed out. Please try again later.", error = timeoutEx.Message });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
-
-
-
         }
     }
 }
