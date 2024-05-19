@@ -13,6 +13,8 @@ namespace PROG_slutprojekt_backend.Controllers
         [HttpGet("chatrooms/{userId}")]
         public async Task<IActionResult> GetChatRoomsByUserId(string userId)
         {
+
+            //hej
             var url = "https://wzqbaxbadiqwdodpcglt.supabase.co";
             var key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6cWJheGJhZGlxd2RvZHBjZ2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTEyODI2NDAsImV4cCI6MjAyNjg1ODY0MH0.edflXOAsbKYV7nuIQaGteGsAbdFaRjB64PyP0uRKnxw";
             try
