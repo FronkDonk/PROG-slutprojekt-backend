@@ -28,9 +28,9 @@ namespace PROG_slutprojekt_backend.Controllers
 
                 var existingUser = supabase.From<SupabaseUser>().Where(x => x.email == user.email).Get();
 
-                
 
-                if(existingUser.Result.Model != null)
+
+                if (existingUser.Result.Model != null)
                 {
                     return new ConflictObjectResult(new { message = "user already has an account" });
                 }
@@ -45,7 +45,18 @@ namespace PROG_slutprojekt_backend.Controllers
                     createdAt = user.createdAt
                 };
 
-                await supabase.From<SupabaseUser>().Insert(model);
+                var storedUser = await supabase.From<SupabaseUser>().Insert(model);
+
+                return new JsonResult(new
+                {
+                    storedUser.Model.id,
+                    storedUser.Model.username,
+                    storedUser.Model.email,
+                    storedUser.Model.createdAt,
+                });
+
+                
+
             }
             catch (Exception ex)
             {
@@ -54,7 +65,6 @@ namespace PROG_slutprojekt_backend.Controllers
             }
           
 
-            return new JsonResult(new { message = "User registered", success = true });
         }
 
         [HttpPost("sign-in")]
