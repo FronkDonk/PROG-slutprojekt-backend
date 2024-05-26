@@ -21,6 +21,12 @@ namespace PROG_slutprojekt_backend.Models
         [Column("created_at")]
         public DateTime createdAt { get; set; }
 
+        [Column("avatar_color_1")]
+        public string? avatarColor1 { get; set; }
+
+        [Column("avatar_color_2")]
+        public string? avatarColor2 { get; set; }
+
 
     }
 
